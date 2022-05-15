@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Сотрудник</title>
+</head>
+<body>
+
+<label for="name">Продукт: </label>
+<b th:text="${product.getNameProd()}" id = "name">VALUE</b>
+</br>
+<label for="dep">Департамент: </label>
+<b th:text="${product.getNameDep()}" id = "dep">VALUE</b>
+</br>
+
+<a th:href="@{/products/{id}/edit(id=${product.getId()})}">Редактировать</a>
+</br>
+
+<form th:method="Delete" th:action="@{/products/{id}(id=${product.getId()})}">
+    <input type="submit" value="Удалить"/>
+</form>
+
+</body>
+</html>

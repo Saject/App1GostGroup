@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый сотрудник</title>
+</head>
+<body>
+
+<form th:method="POST" th:action="@{/employees}" th:object="${employee}">
+    <label for="FIO">Введите нового сотрудника: </label>
+    <input type="text" th:field="*{FIO}" id="FIO"/>
+    <div style="color:red" th:if="${#fields.hasErrors('FIO')}" th:errors="*{FIO}">Name Error</div>
+    <br/>
+    <label for="DEP">Выберите новый департамент: </label>
+    <!--    <input type="text" th:field=*{depId}"" id="dep"/>-->
+    <select th:field="*{depId}" id = "DEP">
+        <option th:each="depart : ${departs}"
+                th:value="${depart.getId()}"
+                th:text="${depart.getName()}">dep</option>
+    </select>
+<!--    <label for="DEP">Dep ID: </label>-->
+<!--    <input type="text" th:field="*{depId}" id="DEP"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('depId')}" th:errors="*{depId}">Dep Error</div>-->
+    <br/>
+    <input type="submit" value="Создать!"/>
+
+</form>
+
+</body>
+</html>

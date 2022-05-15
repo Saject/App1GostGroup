@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование сотрудника</title>
+</head>
+<body>
+
+
+<form th:method="PATCH" th:action="@{/employees/{id}(id=${employee.getId()})}" th:object="${employee}">
+    <label for="FIO">Изменить сотрудника: </label>
+    <input type="text" th:field="*{FIO}" id="FIO"/>
+    <div style="color:red" th:if="${#fields.hasErrors('FIO')}" th:errors="*{FIO}">Name Error</div>
+    <br/>
+    <label for="DEP">Выбирите новый департамент: </label>
+<!--    <input type="text" th:field=*{depId}"" id="dep"/>-->
+    <select th:field="*{depId}" id = "DEP">
+        <option th:each="depart : ${departs}"
+                th:value="${depart.getId()}"
+                th:text="${depart.getName()}">sdfsdf</option>
+    </select>
+<!--    <div class="col-lg-3" th:object="${departs}">-->
+<!--        <select th:field=*{depId}" id="DEP">-->
+<!--            <option value="">Select Test Order</option>-->
+<!--            <option th:each="depart : ${departs}"-->
+<!--                    th:value="${depart.getId()}"-->
+<!--                    th:text="${depart.getName()}">-->
+<!--                /option>-->
+<!--        </select>-->
+<!--    </div>-->
+<!--   <input type="text" th:field="*{depId}" id="dep"/>&ndash;&gt;-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('depId')}" th:errors="*{depId}">Dep Error</div>-->
+    </br>
+    <input type="submit" value="Изменить!"/>
+</form>
+
+</body>
+</html>

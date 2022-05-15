@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Сотрудник</title>
+</head>
+<body>
+<label for="name">ФИО сотрудника: </label>
+<b th:text="${employee.getFIO()}" id = "name" >VALUE</b>
+</br>
+<label for="dep">Департамент сотрудника: </label>
+<b th:text="${employee.getDepName()}" id = "dep">VALUE</b>
+</br>
+<a th:href="@{/employees/{id}/edit(id=${employee.getId()})}">Редактировать</a>
+</br>
+
+<form th:method="Delete" th:action="@{/employees/{id}(id=${employee.getId()})}">
+    <input type="submit" value="Удалить"/>
+</form>
+
+</body>
+</html>

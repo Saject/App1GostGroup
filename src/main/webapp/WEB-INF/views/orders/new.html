@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый заказ</title>
+</head>
+<body>
+
+<form th:method="POST" th:action="@{/orders}" th:object="${order}">
+<!--    <label for="FIO">Введите нового сотрудника: </label>-->
+<!--    <input type="text" th:field="*{FIO}" id="FIO"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('FIO')}" th:errors="*{FIO}">Name Error</div>-->
+<!--    <br/>-->
+    <label for="prodId">Выберите продукт: </label>
+    <!--    <input type="text" th:field=*{depId}"" id="dep"/>-->
+    <select th:field="*{prodId}" id = "prodId">
+        <option th:each="product : ${products}"
+                th:value="${product.getId()}"
+                th:text="${product.getNameProd()}">prod</option>
+    </select>
+    </br>
+        <label for="count">Введите количество, шт: </label>
+        <input type="text" th:field="*{countProd}" id="count"/>
+    <div style="color:red" th:if="${#fields.hasErrors('countProd')}" th:errors="*{countProd}">Name Error</div>
+    </br>
+
+    <div>
+        <label for="deadLineDate">ДедЛайн заказа:</label>
+        <input type="datetime-local" th:field="*{deadLineDate}" id="deadLineDate"/>
+        <div style="color:red" th:if="${#fields.hasErrors('deadLineDate')}" th:errors="*{deadLineDate}">Name Error</div>
+    </div>
+
+<!--    <label for="DEP">Dep ID: </label>-->
+<!--    <input type="text" th:field="*{depId}" id="DEP"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('depId')}" th:errors="*{depId}">Dep Error</div>-->
+    <br/>
+    <input type="submit" value="Создать!"/>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ</title>
+</head>
+<body>
+<label for="orderId"><b>Номер заказа: </b></label>
+<i th:text="${order.getOrderId()}" id = "orderId">VALUE</i>
+</br>
+<label for="fioId"><b>Исполнитель: </b></label>
+<i th:text="${order.getEmployeeName()}" id = "fioId">VALUE</i>
+</br>
+<label for="depId"><b>Отдел: </b></label>
+<i th:text="${order.getDepName()}" id = "depId">VALUE</i>
+</br>
+<label for="prodId"><b>Продукция: </b></label>
+<i th:text="${order.getProdName()}" id = "prodId">VALUE</i>
+</br>
+<label for="count"><b>Количество, шт.: </b></label>
+<i th:text="${order.getCountProd()}" id = "count">VALUE</i>
+</br>
+<label for="dateCreate"><b>Оформлен, дата : </b></label>
+<i th:text="${order.getCreateDate()}" id = "dateCreate">VALUE</i>
+
+</br>
+<label for="dateEnd"><b>Завершить до, дата : </b></label>
+<i th:text="${order.getDeadLineDate()}" id = "dateEnd">VALUE</i>
+</br>
+<label for="dateNow"><b>Текущая дата : </b></label>
+<i th:text="${localDateTime}" id = "dateNow" ></i>
+</br>
+<label for="res"><b>Остаток до завершения (дни, часы): </b></label>
+<i th:text="${remainDay + ' дн.' + ' ' + remainHours + ' ч.'}" id = "res" ></i>
+
+<!--<div th:with="duration=${T(Duration.between(localDateTime, localDateTimeEnd)}"></div>-->
+<!--<div th:text="${duration.toDays() + ' ' + duration.toHoursPart() + ' ' + duration.toMinutesPart()}"></div>-->
+
+
+
+<!--<a th:href="@{/departs/{id}/edit(id=${depart.getId()})}">Редактировать</a>-->
+<!--</br>-->
+
+<form th:method="Delete" th:action="@{/orders/{id}(id=${order.getOrderId()})}">
+    <input type="submit" value="Удалить"/>
+</form>
+
+</body>
+</html>

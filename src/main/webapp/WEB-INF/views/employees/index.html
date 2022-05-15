@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Все сотрудники</title>
+</head>
+<body>
+
+
+
+
+<div th:each="employee : ${employees}">
+
+    <a th:href="@{/employees/{id}(id=${employee.getId()})}"
+       th:text="${employee.getFIO()}">employee</a>
+
+</div>
+
+<br/>
+<hr/>
+
+<a href="/employees/new">Создать нового сотрудника</a>
+<br/>
+<a href="/start">Вернуться</a>
+
+</body>
+</html>
