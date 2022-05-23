@@ -1,6 +1,7 @@
 package ru.gostgroup.contollers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -41,7 +42,7 @@ public class OrdersController {
         return "orders/show";
     }
 
-    @GetMapping("/otdels")
+    @GetMapping(value = "/otdels")
     public String ordersByOtdels(@RequestParam(name = "dep", required = false) Integer depId, Model model) {
         System.out.println(depId);
         model.addAttribute("departs", ordersDAO.departForOrder());
@@ -49,9 +50,8 @@ public class OrdersController {
     }
 
 
-    @GetMapping("/otdels/{depId}")
+    @GetMapping(value= "/otdels/{depId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String showByDep(@PathVariable("depId") int depId, Model model) {
-        System.out.println(depId + " департа");
         model.addAttribute("orders", ordersDAO.showByDep(depId));
         return "orders/index";
     }
@@ -99,8 +99,8 @@ public class OrdersController {
 
     @GetMapping("/unfinishedOrders")
     public String unfinishedOrders(Model model) {
-        System.out.println(ordersDAO.unfinisheedOrders());
-        model.addAttribute("orders", ordersDAO.unfinisheedOrders());
+        System.out.println(ordersDAO.unFinishedOrders());
+        model.addAttribute("orders", ordersDAO.unFinishedOrders());
         return "orders/index";
     }
 

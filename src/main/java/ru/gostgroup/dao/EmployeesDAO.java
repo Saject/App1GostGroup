@@ -64,6 +64,5 @@ public class EmployeesDAO {
                 "order by random() limit 1)\n" +
                 "where emp_id = ?", id, id);
         jdbcTemplate.update("delete from employees where id = ?",id);
-
     }
 }

@@ -147,15 +147,19 @@ public class OrdersDAO {
                 "where p.id = ?\n" +
                 "order by random()\n" +
                 "limit 1", new BeanPropertyRowMapper<>(AutoPersonAndDep.class),order.getProdId()).stream().findAny().orElse(null);
+
         SqlRowSet srs = jdbcTemplate.queryForRowSet("SELECT NEXTVAL('ord_id_seq')");
         srs.next();
+
         order.setOrderId(srs.getInt(1));
         order.setDepId(apad.getDepId());
         order.setEmployeeId(apad.getEmpId());
-        String zakaz = NAME_ZAKAZ + order.getOrderId();
+
+        String orderStr = NAME_ZAKAZ + order.getOrderId();
+
         System.out.println(apad.getDepId() + " " + apad.getEmpId());
-        //System.out.println(result);
-        jdbcTemplate.update("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?);", order.getOrderId(), order.getProdId(), order.getDepId(), order.getCountProd(),order.getCreateDate(),order.getDeadLineDate(), zakaz, order.getEmployeeId());
+
+        jdbcTemplate.update("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?);", order.getOrderId(), order.getProdId(), order.getDepId(), order.getCountProd(),order.getCreateDate(),order.getDeadLineDate(), orderStr, order.getEmployeeId());
     }
 
     public void delete(int id) {
@@ -163,7 +167,7 @@ public class OrdersDAO {
 
     }
 
-    public List<Orders> unfinisheedOrders() {
+    public List<Orders> unFinishedOrders() {
         LocalDateTime datetime = LocalDateTime.now();
         System.out.println(datetime.toString() + "Сегодня");
         return jdbcTemplate.query("select o.orderid as orderId, \n" +

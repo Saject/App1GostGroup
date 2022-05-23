@@ -21,14 +21,14 @@
 <i th:text="${order.getCountProd()}" id = "count">VALUE</i>
 </br>
 <label for="dateCreate"><b>Оформлен, дата : </b></label>
-<i th:text="${order.getCreateDate()}" id = "dateCreate">VALUE</i>
+<i th:text="${#temporals.format(order.getCreateDate(),'dd-MM-yyyy HH:mm')}" id = "dateCreate">VALUE</i>
 
 </br>
 <label for="dateEnd"><b>Завершить до, дата : </b></label>
-<i th:text="${order.getDeadLineDate()}" id = "dateEnd">VALUE</i>
+<i th:text="${#temporals.format(order.getDeadLineDate(),'dd-MM-yyyy HH:mm')}" id = "dateEnd">VALUE</i>
 </br>
 <label for="dateNow"><b>Текущая дата : </b></label>
-<i th:text="${localDateTime}" id = "dateNow" ></i>
+<i th:text="${#temporals.format(localDateTime,'dd-MM-yyyy HH:mm')}" id = "dateNow" ></i>
 </br>
 <label for="res"><b>Остаток до завершения (дни, часы): </b></label>
 <i th:text="${remainDay + ' дн.' + ' ' + remainHours + ' ч.'}" id = "res" ></i>
