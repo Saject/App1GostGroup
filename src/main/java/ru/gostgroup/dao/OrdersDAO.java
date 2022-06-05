@@ -1,195 +1,115 @@
 package ru.gostgroup.dao;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
-import org.thymeleaf.util.DateUtils;
-import ru.gostgroup.models.Departs;
-import ru.gostgroup.models.Employees;
-import ru.gostgroup.models.Orders;
-import ru.gostgroup.models.Products;
-import ru.gostgroup.myutils.AutoPersonAndDep;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import ru.gostgroup.models.OrdersModel;
+import ru.gostgroup.pojo.AutoPersonAndDep;
 
-import java.time.LocalDate;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
-@Component
-public class OrdersDAO {
 
-    private final JdbcTemplate jdbcTemplate;
-    private static final String NAME_ZAKAZ = "Заказ№";
+@Repository
+public class OrdersDAO implements IOrdersDAO {
+
+    private final SessionFactory sessionFactory;
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     @Autowired
-    public OrdersDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public OrdersDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    public List<Orders> index() {
-        return jdbcTemplate.query("select o.orderid as orderId, \n" +
-                "o.nameorder as orderName,\n" +
-                "o.prod_id as prodId, \n" +
-                "p.nameprod as prodName, \n" +
-                "o.dep_id as depId,\n" +
-                "d.name as depName,\n" +
-                "o.emp_id as employeeId,\n" +
-                "e.fio as employeeName,\n" +
-                "o.create_date as createDate, \n" +
-                "o.deadline_date as deadLineDate, \n" +
-                "o.countprod as countProd,\n" +
-                "now() as nowDate\n" +
-                "from orders o\n" +
-                "inner join production p\n" +
-                "on o.prod_id = p.id\n" +
-                "inner join employees e\n" +
-                "on o.emp_id = e.id\n" +
-                "inner join departament d\n" +
-                "on o.dep_id = d.id\n" +
-                "order by o.nameorder", new BeanPropertyRowMapper<>(Orders.class));
+
+    @Override
+    @Transactional
+    public List<OrdersModel> index() {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("from OrdersModel order by orderId", OrdersModel.class).getResultList();
     }
 
-    public List<Orders> showByDep(int id) {
-        List<Orders> t = jdbcTemplate.query("select o.orderid as orderId, \n" +
-                "o.nameorder as orderName,\n" +
-                "o.prod_id as prodId, \n" +
-                "p.nameprod as prodName, \n" +
-                "o.dep_id as depId,\n" +
-                "d.name as depName,\n" +
-                "o.emp_id as employeeId,\n" +
-                "e.fio as employeeName,\n" +
-                "o.create_date as createDate, \n" +
-                "o.deadline_date as deadLineDate, \n" +
-                "o.countprod as countProd\n" +
-                "from orders o\n" +
-                "inner join production p\n" +
-                "on o.prod_id = p.id\n" +
-                "inner join employees e\n" +
-                "on o.emp_id = e.id\n" +
-                "inner join departament d\n" +
-                "on o.dep_id = d.id\n" +
-                "where o.dep_id = ?" +
-                "order by o.nameorder", new BeanPropertyRowMapper<>(Orders.class), id);
-        System.out.println(t);
-        return t;
+    @Override
+    @Transactional
+    public OrdersModel show(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(OrdersModel.class,id);
     }
 
-    public List<Orders> showByEmp(int id) {
-        List<Orders> t = jdbcTemplate.query("select o.orderid as orderId, \n" +
-                "o.nameorder as orderName,\n" +
-                "o.prod_id as prodId, \n" +
-                "p.nameprod as prodName, \n" +
-                "o.dep_id as depId,\n" +
-                "d.name as depName,\n" +
-                "o.emp_id as employeeId,\n" +
-                "e.fio as employeeName,\n" +
-                "o.create_date as createDate, \n" +
-                "o.deadline_date as deadLineDate, \n" +
-                "o.countprod as countProd\n" +
-                "from orders o\n" +
-                "inner join production p\n" +
-                "on o.prod_id = p.id\n" +
-                "inner join employees e\n" +
-                "on o.emp_id = e.id\n" +
-                "inner join departament d\n" +
-                "on o.dep_id = d.id\n" +
-                "where o.emp_id = ?" +
-                "order by o.nameorder", new BeanPropertyRowMapper<>(Orders.class), id);
-        System.out.println(t);
-        return t;
+    @Override
+    @Transactional
+    public void update(long id, OrdersModel updatedOrder) {
+
     }
 
-    public Orders show(int id) {
-        return jdbcTemplate.query("select o.orderid as orderId, \n" +
-                        "o.nameorder as orderName,\n" +
-                        "o.prod_id as prodId, \n" +
-                        "p.nameprod as prodName, \n" +
-                        "o.dep_id as depId,\n" +
-                        "d.name as depName,\n" +
-                        "o.emp_id as employeeId,\n" +
-                        "e.fio as employeeName,\n" +
-                        "o.create_date as createDate, \n" +
-                        "o.deadline_date as deadLineDate, \n" +
-                        "o.countprod as countProd\n" +
-                        "from orders o\n" +
-                        "inner join production p\n" +
-                        "on o.prod_id = p.id\n" +
-                        "inner join employees e\n" +
-                        "on o.emp_id = e.id\n" +
-                        "inner join departament d\n" +
-                        "on o.dep_id = d.id\n" +
-                        "where o.orderid = ?\n" +
-                        "order by o.nameorder", new BeanPropertyRowMapper<>(Orders.class), id)
-                .stream().findAny().orElse(null);
-    }
 
-    public List<Products> productForOrder() {
-        return jdbcTemplate.query("select * from production", new BeanPropertyRowMapper<>(Products.class));
-    }
+    @Override
+    @Transactional
+    public void save(OrdersModel order) {
+        Session session = sessionFactory.getCurrentSession();
 
-    public List<Departs> departForOrder() {
-        return jdbcTemplate.query("select * from departament", new BeanPropertyRowMapper<>(Departs.class));
-    }
+//        Query query = session.createNativeQuery("select e.dep_id as \"depId\", e.id as \"empId\" from production p\n" +
+//                "join employees e on p.dep_id = e.dep_id\n" +
+//                "where p.id = :paramId order by random() limit 1");
+//        query.setParameter("paramId",order.getProdId());
+//
+//        session.createNamedQuery("MyDto", MyDto.class)
+//
+//        AutoPersonAndDep apad = (AutoPersonAndDep)query.unwrap(org.hibernate.query.NativeQuery.class)
+//                .setResultTransformer(Transformers.aliasToBean(AutoPersonAndDep.class))
+//                .getSingleResult();
 
-    public List<Employees> employeesForOrder() {
-        return jdbcTemplate.query("select * from employees order by fio", new BeanPropertyRowMapper<>(Employees.class));
-    }
+        AutoPersonAndDep apad = session.createNamedQuery("AutoPersonAndDepDTO",AutoPersonAndDep.class).
+                setParameter("paramId",order.getProdId()).getSingleResult();
 
-    public void save(Orders order) {
-        order.setCreateDate(LocalDateTime.parse(LocalDateTime.now().format(FORMATTER),FORMATTER));
-        AutoPersonAndDep apad = jdbcTemplate.query("select e.dep_id as depId, e.id as empId, e.fio from production p\n" +
-                "join employees e on p.dep_id = e.dep_id\n" +
-                "where p.id = ?\n" +
-                "order by random()\n" +
-                "limit 1", new BeanPropertyRowMapper<>(AutoPersonAndDep.class),order.getProdId()).stream().findAny().orElse(null);
-
-        SqlRowSet srs = jdbcTemplate.queryForRowSet("SELECT NEXTVAL('ord_id_seq')");
-        srs.next();
-
-        order.setOrderId(srs.getInt(1));
+        System.out.println(apad + "Мой класс" + order.getOrderId());
+        order.setCreateDate(LocalDateTime.now());
         order.setDepId(apad.getDepId());
-        order.setEmployeeId(apad.getEmpId());
-
-        String orderStr = NAME_ZAKAZ + order.getOrderId();
-
-        System.out.println(apad.getDepId() + " " + apad.getEmpId());
-
-        jdbcTemplate.update("INSERT INTO orders VALUES (?, ?, ?, ?, ?, ?, ?, ?);", order.getOrderId(), order.getProdId(), order.getDepId(), order.getCountProd(),order.getCreateDate(),order.getDeadLineDate(), orderStr, order.getEmployeeId());
+        order.setEmpId(apad.getEmpId());
+        System.out.println(order);
+        session.save(order);
     }
 
-    public void delete(int id) {
-        jdbcTemplate.update("delete from orders where orderid = ?",id);
 
+    @Override
+    @Transactional
+    public void delete(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(session.get(OrdersModel.class,id));
     }
 
-    public List<Orders> unFinishedOrders() {
-        LocalDateTime datetime = LocalDateTime.now();
-        System.out.println(datetime.toString() + "Сегодня");
-        return jdbcTemplate.query("select o.orderid as orderId, \n" +
-                "o.nameorder as orderName,\n" +
-                "o.prod_id as prodId, \n" +
-                "p.nameprod as prodName, \n" +
-                "o.dep_id as depId,\n" +
-                "d.name as depName,\n" +
-                "o.emp_id as employeeId,\n" +
-                "e.fio as employeeName,\n" +
-                "o.create_date as createDate, \n" +
-                "o.deadline_date as deadLineDate, \n" +
-                "o.countprod as countProd\n" +
-                "from orders o\n" +
-                "inner join production p\n" +
-                "on o.prod_id = p.id\n" +
-                "inner join employees e\n" +
-                "on o.emp_id = e.id\n" +
-                "inner join departament d\n" +
-                "on o.dep_id = d.id\n" +
-                "where o.deadline_date > ?\n" +
-                "order by o.nameorder",new BeanPropertyRowMapper<>(Orders.class),datetime);
+    @Override
+    @Transactional
+    public List<OrdersModel> showByDep(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("from OrdersModel where depId = :paramDepId order by orderId",OrdersModel.class);
+        query.setParameter("paramDepId", id);
+        return query.getResultList();
+    }
+//
+    @Override
+    @Transactional
+    public List<OrdersModel> showByEmp(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("from OrdersModel where empId = :paramEmpId order by orderId",OrdersModel.class);
+        query.setParameter("paramEmpId", id);
+        return query.getResultList();
+    }
+
+
+    @Override
+    @Transactional
+    public List<OrdersModel> unFinishedOrders() {
+        LocalDateTime dateNow = LocalDateTime.now();
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("from OrdersModel where deadLineDate > :paramEmpId order by orderId",OrdersModel.class);
+        query.setParameter("paramEmpId", dateNow);
+        return query.getResultList();
     }
 
 }

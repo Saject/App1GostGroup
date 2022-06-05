@@ -1,68 +1,76 @@
 package ru.gostgroup.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
-import ru.gostgroup.models.Departs;
-import ru.gostgroup.models.Employees;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import ru.gostgroup.models.EmployeesModel;
+import ru.gostgroup.models.OrdersModel;
+import ru.gostgroup.pojo.AutoPersonAndDep;
+
+
 import java.util.List;
 
-@Component
-public class EmployeesDAO {
+@Repository
+public class EmployeesDAO implements IEmployeesDAO {
 
-    private final JdbcTemplate jdbcTemplate;
-
+    //private final JdbcTemplate jdbcTemplate;
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public EmployeesDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public EmployeesDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+
     }
 
-    public List<Departs> departForEmployees() {
-        return jdbcTemplate.query("select * from departament", new BeanPropertyRowMapper<>(Departs.class));
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EmployeesModel> index() {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("from EmployeesModel order by fio", EmployeesModel.class);
+        List<EmployeesModel> list = query.getResultList();
+        return list;
     }
 
-    public List<Employees> index() {
-        List<Employees> t = jdbcTemplate.query("select * from employees", new BeanPropertyRowMapper<>(Employees.class));
-        System.out.println(t);
-        return jdbcTemplate.query("select * from employees order by fio", new BeanPropertyRowMapper<>(Employees.class));
+    @Override
+    @Transactional(readOnly = true)
+    public EmployeesModel show(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("from EmployeesModel a where a.id = :id", EmployeesModel.class);
+        query.setParameter("id", id);
+        EmployeesModel emp = session.get(EmployeesModel.class,id);
+        System.out.println(emp.getDeparts().getName());
+        return emp;
     }
 
-    public Employees show(int id) {
-        return jdbcTemplate.query("select e.id, e.fio, e.dep_id, d.name as depName from employees e\n" +
-                        "    inner join departament d\n" +
-                        "on e.dep_id = d.id where e.id=?", new BeanPropertyRowMapper<>(Employees.class), id)
-                .stream().findAny().orElse(null);
+    @Override
+    @Transactional
+    public void save(EmployeesModel employee) {
+        Session session = sessionFactory.getCurrentSession();
+        System.out.println(employee);
+        session.save(employee);
     }
 
-    public void save(Employees employee) {
-        SqlRowSet srs = jdbcTemplate.queryForRowSet("SELECT NEXTVAL('emp_id_seq')");
-        srs.next();
-        int result = srs.getInt(1);
-        System.out.println(result);
-        jdbcTemplate.update("INSERT INTO employees values(?,?,?)", result, employee.getFIO(), employee.getDepId());
+    @Override
+    @Transactional
+    public void update(long id, EmployeesModel updatedEmployee) {
+        Session session = sessionFactory.getCurrentSession();
+        EmployeesModel personToBeUpdated = session.get(EmployeesModel.class, id);
+        personToBeUpdated.setFio(updatedEmployee.getFio());
+        personToBeUpdated.setDepId(updatedEmployee.getDepId());
     }
-
-    public void update(int id, Employees updatedEmployee) {
-        jdbcTemplate.update("UPDATE employees SET fio=?, dep_id=? where id=?", updatedEmployee.getFIO(), updatedEmployee.getDepId(), id);
-        //jdbcTemplate.update(INSERT INTO employees VALUES())
-    }
-
-    public void delete(int id) {
-        jdbcTemplate.update("UPDATE orders \n" +
-                "SET emp_id=(select id from employees\n" +
-                "where dep_id in (select dep_id from employees where id = ?)\n" +
-                "order by random() limit 1)\n" +
-                "where emp_id = ?", id, id);
-        jdbcTemplate.update("delete from employees where id = ?",id);
+//
+    @Override
+    @Transactional
+    public void delete(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        session.createNamedQuery("updatedOrder", OrdersModel.class).
+                setParameter("paramEmpId",id).executeUpdate();
+        session.remove(session.get(EmployeesModel.class, id));
     }
 }

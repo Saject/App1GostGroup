@@ -1,55 +1,70 @@
 package ru.gostgroup.dao;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.gostgroup.models.Departs;
-import ru.gostgroup.models.Employees;
-import ru.gostgroup.models.Products;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import ru.gostgroup.models.ProductionModel;
+
 
 import java.util.List;
 
-@Component
-public class ProductDAO {
+@Repository
+public class ProductDAO implements IProductsDAO {
 
-    private final JdbcTemplate jdbcTemplate;
+
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public ProductDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ProductDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    public List<Products> index() {
-        return jdbcTemplate.query("select * from production", new BeanPropertyRowMapper<>(Products.class));
+
+    @Override
+    @Transactional
+    public List<ProductionModel> index() {
+        Session session = sessionFactory.getCurrentSession();
+        List<ProductionModel> prodList = session.createQuery("from ProductionModel ", ProductionModel.class).getResultList();
+        return prodList;
     }
 
-    public Products show(int id) {
-        return jdbcTemplate.query("select p.id, p.nameProd, p.dep_id, d.name as NameDep from production p\n" +
-                        "    inner join departament d\n" +
-                        "on p.dep_id = d.id where p.id=?", new BeanPropertyRowMapper<>(Products.class), id)
-                .stream().findAny().orElse(null);
+    @Override
+    @Transactional
+    public ProductionModel show(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(ProductionModel.class, id);
     }
 
-    public List<Departs> departForProducts() {
-        return jdbcTemplate.query("select * from departament", new BeanPropertyRowMapper<>(Departs.class));
+
+    @Override
+    @Transactional
+    public void save(ProductionModel prod) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(prod);
     }
 
-    public void save(Products prod) {
-        SqlRowSet srs = jdbcTemplate.queryForRowSet("select max(id) from production");
-        srs.next();
-        int index = srs.getInt(1) + 1;
-        jdbcTemplate.update("INSERT INTO production values(?,?,?)", index, prod.getNameProd(), prod.getDepId());
-    }
-
-    public void update(int id, Products updatedProd) {
-        jdbcTemplate.update("UPDATE production SET nameprod=?, dep_id=? where id=?", updatedProd.getNameProd(), updatedProd.getDepId(), id);
+    @Override
+    @Transactional
+    public void update(long id, ProductionModel updatedProd) {
+        Session session = sessionFactory.getCurrentSession();
+        ProductionModel prod = session.get(ProductionModel.class,id);
+        prod.setId(updatedProd.getId());
+        prod.setNameProd(updatedProd.getNameProd());
+        //prod.setDepId(updatedProd.getDepId());
         //jdbcTemplate.update(INSERT INTO employees VALUES())
     }
 
-    public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM production where id=?", id);
+    @Override
+    @Transactional
+    public void delete(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(session.get(ProductionModel.class,id));
     }
 
 

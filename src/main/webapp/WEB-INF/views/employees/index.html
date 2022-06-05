@@ -12,7 +12,7 @@
 <div th:each="employee : ${employees}">
 
     <a th:href="@{/employees/{id}(id=${employee.getId()})}"
-       th:text="${employee.getFIO()}">employee</a>
+       th:text="${employee.getFio()}">employee</a>
 
 </div>
 

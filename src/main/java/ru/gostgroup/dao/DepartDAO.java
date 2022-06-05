@@ -1,52 +1,78 @@
 package ru.gostgroup.dao;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
-import ru.gostgroup.models.Departs;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import ru.gostgroup.models.DepartamentModel;
+import ru.gostgroup.models.EmployeesModel;
 
 import java.util.List;
 
-@Component
-public class DepartDAO {
+@Repository
+public class DepartDAO implements IDepartsDAO {
 
-    private final JdbcTemplate jdbcTemplate;
+//    private final JdbcTemplate jdbcTemplate;
+
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public DepartDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public DepartDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    public List<Departs> index() {
-        return jdbcTemplate.query("select * from departament order by name", new BeanPropertyRowMapper<>(Departs.class));
+    @Override
+    @Transactional
+    public List<DepartamentModel> index() {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("from DepartamentModel order by name", DepartamentModel.class)
+                .getResultList();
     }
 
-    public Departs show(int id) {
-        Departs d = jdbcTemplate.query("select * from departament where id=?", new BeanPropertyRowMapper<>(Departs.class), id)
-                .stream().findAny().orElse(null);
-        System.out.println(d.toString());
-        return jdbcTemplate.query("select * from departament where id=?", new BeanPropertyRowMapper<>(Departs.class), id)
-                .stream().findAny().orElse(null);
-
+    @Override
+    @Transactional
+    public DepartamentModel show(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(DepartamentModel.class,id);
     }
 
-    public void save(Departs dep) {
-        SqlRowSet srs = jdbcTemplate.queryForRowSet("select max(id) from departament");
-        srs.next();
-        int index = srs.getInt(1) + 1;
-        jdbcTemplate.update("INSERT INTO departament values(?,?)", index, dep.getName());
+    @Override
+    @Transactional
+    public void update(long id, DepartamentModel updatedDepartament) {
+        Session session = sessionFactory.getCurrentSession();
+        DepartamentModel dep = session.get(DepartamentModel.class,id);
+        dep.setName(updatedDepartament.getName());
     }
 
-    public void update(int id, Departs updatedDep) {
-        jdbcTemplate.update("UPDATE departament SET name=? where id=?", updatedDep.getName(), id);
-        //jdbcTemplate.update(INSERT INTO employees VALUES())
+    @Override
+    @Transactional
+    public void save(DepartamentModel depart) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(depart);
     }
 
-    public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM departament where id=?",id);
+    @Override
+    @Transactional
+    public void delete(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        session.remove(session.get(DepartamentModel.class,id));
     }
+
+    //
+//    public void save(Departs dep) {
+//        SqlRowSet srs = jdbcTemplate.queryForRowSet("select max(id) from departament");
+//        srs.next();
+//        int index = srs.getInt(1) + 1;
+//        jdbcTemplate.update("INSERT INTO departament values(?,?)", index, dep.getName());
+//    }
+//
+
+//
+//    public void delete(int id) {
+//        jdbcTemplate.update("DELETE FROM departament where id=?",id);
+//    }
 
 
 }

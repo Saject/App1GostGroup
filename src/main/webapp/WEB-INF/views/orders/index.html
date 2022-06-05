@@ -9,7 +9,8 @@
 <div th:each="order : ${orders}">
 
     <a th:href="@{/orders/{id}(id=${order.getOrderId()})}"
-       th:text="${order.getOrderName()}">depart</a>
+       th:text="${order.ORDER_NAME} + ${order.getOrderId()} + ' от ' +
+       ${#temporals.format(order.getCreateDate(),'dd-MM-yyyy')}">depart</a>
 
 </div>
 <!--<br/>-->

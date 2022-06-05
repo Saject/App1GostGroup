@@ -15,7 +15,7 @@
     <select id="empId" name="emp">
         <option th:each="employee : ${employees}"
                 th:value="${employee.getId()}"
-                th:text="${employee.getFIO()}">emp</option>
+                th:text="${employee.getFio()}">emp</option>
     </select>
 
     <!--    <label for="DEP">Dep ID: </label>-->

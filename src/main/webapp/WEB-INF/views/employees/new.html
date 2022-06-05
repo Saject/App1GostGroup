@@ -7,9 +7,9 @@
 <body>
 
 <form th:method="POST" th:action="@{/employees}" th:object="${employee}">
-    <label for="FIO">Введите нового сотрудника: </label>
-    <input type="text" th:field="*{FIO}" id="FIO"/>
-    <div style="color:red" th:if="${#fields.hasErrors('FIO')}" th:errors="*{FIO}">Name Error</div>
+    <label for="fio">Введите нового сотрудника: </label>
+    <input type="text" th:field="*{fio}" id="fio"/>
+    <div style="color:red" th:if="${#fields.hasErrors('fio')}" th:errors="*{fio}">Name Error</div>
     <br/>
     <label for="DEP">Выберите новый департамент: </label>
     <!--    <input type="text" th:field=*{depId}"" id="dep"/>-->

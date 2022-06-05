@@ -6,10 +6,10 @@
 </head>
 <body>
 <label for="name">ФИО сотрудника: </label>
-<b th:text="${employee.getFIO()}" id = "name" >VALUE</b>
+<b th:text="${employee.getFio()}" id = "name" >VALUE</b>
 </br>
 <label for="dep">Департамент сотрудника: </label>
-<b th:text="${employee.getDepName()}" id = "dep">VALUE</b>
+<b th:text="${employee.getDeparts().getName()}" id = "dep">VALUE</b>
 </br>
 <a th:href="@{/employees/{id}/edit(id=${employee.getId()})}">Редактировать</a>
 </br>
